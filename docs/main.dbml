@@ -1,0 +1,107 @@
+
+enum copy_condition {
+    as_new
+    fine
+    very_good
+    good
+    fair
+    poor
+}
+
+// Actual tangible book/magazine/etc.
+Table copy {
+    id int [pk, increment]
+    edition_id int [ref: > edition.id]
+    condition copy_condition
+}
+
+// Generic description of printed material.
+Table publication {
+    id int [pk, increment]
+    category_id int [ref: > category.id ]
+    title string
+}
+
+Table publication_tagging {
+    publication_id int [pk, ref: > publication.id]
+    tag_id int [pk, ref: > tag.id]
+}
+
+// Kind of a publication (is it a book? is it a magazine? is it a published
+// document?).
+Table category {
+    id int [pk, increment]
+    name string
+}
+
+// Descriptive label of the content of the publication, mood, genre, etc.
+Table tag {
+    id int [pk, increment]
+    name string
+}
+
+// Particular edition/number/issue of a publication.
+Table edition {
+    id int [pk, increment]
+    publication_id int [ref: > publication.id]
+    author_id int [ref: <> author.id]
+}
+
+// Note on qualities of a particular Print.
+Table review {
+    id int [pk, increment]
+    reviewer_id int [ref: - user.id]
+    content text
+}
+
+// Act of a Print transferred to a User for some
+// limited time.
+Table loan {
+    id int [pk, increment]
+    copy_id int [ref: - copy.id]
+    borrower_id int [ref: - user.id]
+    taken_date date
+    due_date date
+}
+
+// Action related to publication copy (eg book added to the library, book loaned, book
+// returned, book destroyed, book lost, etc).
+Table transfer_event {
+    id int [pk, increment]
+    copy_id int [ref: - copy.id]
+    event_timestamp timestamp
+}
+
+// Person that has produced a particular publication or took part in it.
+Table author {
+    id int [pk, increment]
+
+    first_name string
+    last_name string
+}
+
+// User (includes readers/staff/admins).
+Table user {
+    id int [pk, increment]
+    role_id int [ref: > role.id]
+}
+
+// Role that defines a particular set of permissions.
+Table role {
+    id int [pk, increment]
+    name string
+}
+
+Table permission {
+    id int [pk, increment]
+    action_code string
+    role_id int [ref: > role.id]
+}
+
+// Security-related action. Logs operations on the database.
+Table access_event {
+    id int [pk, increment]
+    event_timestamp timestamp
+    initiator_id int [not null, ref: - user.id]
+    target_id int [null, ref: - user.id]
+}
