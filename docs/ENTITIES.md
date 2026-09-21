@@ -3,7 +3,7 @@
 
 В данном файле описаны все субъекты и сущности системы электронной библиотеки, приведены их названия, описания, необходимые для хранения поля, их типы данных и ограничения. Все сущности логически сгруппированы.
 
-## Общие определения
+## Общие положения
 
 В данном файле при описании сущностей используются спецификаторы доменов допустимых значений, принимаемых полями сущности. В данной секции описаны эти домены:
 1. $\text{BOOL}=\{\top,\bot\}$.
@@ -11,6 +11,8 @@
 1. $\text{TEXT}$ - строка в кодировке **UTF-8**, в соответствии со стандартом Unicode®.
 1. $\text{DATETIME}$ - время и дата с временной зоной.
 1. $\text{JSON}$ - текст в формате JSON, в соответствии с RFC 8259 или любым его надмножеством.
+
+Все таблицы связей *многие ко многим* предполагаются построчно уникальными.
 
 ## Ролевая система контроля доступом
 
@@ -25,18 +27,18 @@
 - *Сущность*: пользователь
 - *Таблица*: user
 
-| Название поля         | Тип данных | Ограничения           | Назначение               | Комментарий |
-| --------------------- | ---------- | --------------------- | ------------------------ | ----------- |
-| id                    | INT        | PRIMARY KEY           |                          |             |
-| name                  | TEXT       | NOT NULL              | имя                      |             |
-| surname               | TEXT       | NOT NULL              | фамилия                  |             |
-| middle_name           | TEXT       |                       | отчество                 |             |
-| identification_number | TEXT       | NOT NULL              | ид. номер                |             |
-| address               | TEXT       | NOT NULL              | место жительства         |             |
-| phone_number          | TEXT       | NOT NULL, CHECK       | номер телефона           |             |
-| email                 | TEXT       | UNIQUE, NOT NULL      | адрес эл. почты          |             |
-| password              | TEXT       | NOT NULL              | хеш пароля               |             |
-| user_data_id          | INT        | FOREIGN KEY, NOT NULL | доп. данные пользователя |             |
+| Название поля         | Тип данных | Ограничения                   | Назначение               | Комментарий |
+| --------------------- | ---------- | ----------------------------- | ------------------------ | ----------- |
+| id                    | INT        | PRIMARY KEY                   |                          |             |
+| name                  | TEXT       | NOT NULL                      | имя                      |             |
+| surname               | TEXT       | NOT NULL                      | фамилия                  |             |
+| middle_name           | TEXT       |                               | отчество                 |             |
+| identification_number | TEXT       | NOT NULL                      | ид. номер                |             |
+| address               | TEXT       | NOT NULL                      | место жительства         |             |
+| phone_number          | TEXT       | NOT NULL, CHECK               | номер телефона           |             |
+| email                 | TEXT       | UNIQUE, NOT NULL              | адрес эл. почты          |             |
+| password              | TEXT       | NOT NULL                      | хеш пароля               |             |
+| user_data_id          | INT        | FOREIGN KEY, NOT NULL, UNIQUE | доп. данные пользователя |             |
 
 - *Сущность*: Разрешение
 - *Таблица*: permission
@@ -45,6 +47,8 @@
 | ------------- | ---------- | ----------------------- | ---------- | ----------- |
 | id            | INT        | PRIMARY KEY             |            |             |
 | key           | TEXT       | NOT NULL, UNIQUE, CHECK |            |             |
+
+Формат ключа задается как набор строк (ASCII буквы в нижнем регистре, цифры, нижние подчеркивания и дефисы), разделенных точками. Ключи полагаются иерархическими, но это свойство системой не проверяется.
 
 - *Сущность*: Роль
 - *Таблица*: role
@@ -103,6 +107,7 @@
 | id            | INT        | PRIMARY KEY           |                      |             |
 | headline      | TEXT       | NOT NULL              | название (заголовок) |             |
 | periodic_id   | INT        | NOT NULL, FOREIGN KEY |                      |             |
+| publish_date  | DATETIME   | NOT NULL              |                      |             |
 
 - *Сущность*: Состояние печатного экземпляра
 - *Перечисление*: `enum PRINT_STATE { AS_NEW, VERY_GOOD, GOOD, FAIR, POOR }`
@@ -172,6 +177,8 @@
 | birth_date    | DATETIME   |             |            |             |
 | death_date    | DATETIME   |             |            |             |
 
+Невозможно одновременное отсутствие как имени/фамилии, так и псевдонима.
+
 - *Сущность*: Авторы книги
 - *Таблица*: book_author
 
@@ -229,7 +236,7 @@
 | overdue       | INTERVAL   | NOT NULL              | величина просрочки | интервал пуст, если экземпляр возвращен вовремя |
 
 - *Сущность*: Возврат экземпляра выпуска периодического издания
-- *Таблица*: issue_return
+- *Таблица*: issue_copy_return
 
 | Название поля | Тип данных | Ограничения           | Назначение         | Комментарий                                     |
 | ------------- | ---------- | --------------------- | ------------------ | ----------------------------------------------- |
@@ -244,11 +251,11 @@
 | Название поля | Тип данных | Ограничения           | Назначение | Комментарий |
 | ------------- | ---------- | --------------------- | ---------- | ----------- |
 | id            | INT        | PRIMARY KEY           |            |             |
-| copy_copy_id  | INT        | NOT NULL, FOREIGN KEY |            |             |
+| copy_id       | INT        | NOT NULL, FOREIGN KEY |            |             |
 | loss_date     | DATETIME   | NOT NULL              | дата утери |             |
 
 - *Сущность*: Утеря экземпляра выпуска периодического издания
-- *Таблица*: issue_loss
+- *Таблица*: issue_copy_loss
 
 | Название поля | Тип данных | Ограничения           | Назначение | Комментарий |
 | ------------- | ---------- | --------------------- | ---------- | ----------- |
@@ -259,7 +266,7 @@
 ## Безопасность и журналирование
 
 - *Сущность*: Событие безопасности
-- *Перечисление*: `enum AUDIT_EVENT { LOGIN, LOGOUT, REGISTER, GRANT_PERMISSION, REVOKE_PERMISSION, ROLE_UPDATE, FAILED_IDENTIFICATION, FAILED_LOGIN }`
+- *Перечисление*: `enum AUDIT_EVENT { LOGIN, LOGOUT, REGISTER, GRANT_PERMISSION, REVOKE_PERMISSION, DENIED_PERMISSION, ROLE_UPDATE, FAILED_IDENTIFICATION, FAILED_LOGIN }`
 
 - *Сущность*: Аудит
 - *Таблица*: audit
@@ -269,7 +276,7 @@
 | id            | INT         | PRIMARY KEY           |            |                      |
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | action        | AUDIT_EVENT | NOT NULL              |            |                      |
-| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| created_at    | DATETIME    | NOT NULL              |            |                      |
 | body          | JSON        |                       |            | Определено действием |
 
 - *Сущность*: Событие по изменению печатного издания
@@ -284,7 +291,7 @@
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | action        | PRINT_EVENT | NOT NULL              |            |                      |
 | book_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| created_at    | DATETIME    | NOT NULL              |            |                      |
 | body          | JSON        |                       |            | Определено действием |
 
 - *Сущность*: Изменение периодического издания
@@ -296,7 +303,7 @@
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | action        | PRINT_EVENT | NOT NULL              |            |                      |
 | periodic_id   | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| created_at    | DATETIME    | NOT NULL              |            |                      |
 | body          | JSON        |                       |            | Определено действием |
 
 - *Сущность*: Изменение экземпляра книги
@@ -308,7 +315,7 @@
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | action        | PRINT_EVENT | NOT NULL              |            |                      |
 | copy_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| created_at    | DATETIME    | NOT NULL              |            |                      |
 | body          | JSON        |                       |            | Определено действием |
 
 - *Сущность*: Изменение выпуска периодического издания
@@ -320,7 +327,7 @@
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | action        | PRINT_EVENT | NOT NULL              |            |                      |
 | issue_id      | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| created_at    | DATETIME    | NOT NULL              |            |                      |
 | body          | JSON        |                       |            | Определено действием |
 
 - *Сущность*: Изменение экземпляра выпуска периодического издания
@@ -332,7 +339,7 @@
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | action        | PRINT_EVENT | NOT NULL              |            |                      |
 | issue_copy_id | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| created_at    | DATETIME    | NOT NULL              |            |                      |
 | body          | JSON        |                       |            | Определено действием |
 
 

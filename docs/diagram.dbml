@@ -1,0 +1,318 @@
+Enum PRINT_STATE {
+  AS_NEW
+  VERY_GOOD
+  GOOD
+  FAIR
+  POOR
+}
+
+Enum PRINT_STATUS {
+  STORED
+  LOANED
+  LOST
+  REMOVED
+}
+
+Enum AUDIT_EVENT {
+  LOGIN
+  LOGOUT
+  REGISTER
+  GRANT_PERMISSION
+  REVOKE_PERMISSION
+  DENIED_PERMISSION
+  ROLE_UPDATE
+  FAILED_IDENTIFICATION
+  FAILED_LOGIN
+}
+
+Enum PRINT_EVENT {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+Table user_data {
+  id integer [pk]
+  is_active boolean [not null]
+}
+
+Table user {
+  id integer [pk]
+  name text [not null]
+  surname text [not null]
+  middle_name text
+  identification_number text [not null]
+  address text [not null]
+  phone_number text [not null]
+  email text [not null, unique]
+  password text [not null]
+  user_data_id integer [not null, unique]
+
+  indexes {
+    user_data_id [unique]
+  }
+}
+
+Table permission {
+  id integer [pk]
+  key text [not null, unique]
+}
+
+Table role {
+  id integer [pk]
+  name text [not null, unique]
+}
+
+Table role_permission {
+  id integer [pk]
+  permission_id integer [not null]
+  role_id integer [not null]
+
+  indexes {
+    (permission_id, role_id) [unique]
+  }
+}
+
+Table user_role {
+  id integer [pk]
+  role_id integer [not null]
+  user_id integer [not null]
+
+  indexes {
+    (role_id, user_id) [unique]
+  }
+}
+
+Table book {
+  id integer [pk]
+  title text [not null]
+  publish_date timestamptz [not null]
+  isbn text [not null]
+}
+
+Table periodic {
+  id integer [pk]
+  name text [not null]
+  issn text [not null]
+}
+
+Table issue {
+  id integer [pk]
+  headline text [not null]
+  periodic_id integer [not null]
+  publish_date timestamptz [not null]
+}
+
+Table copy {
+  id integer [pk]
+  book_id integer [not null]
+  state PRINT_STATE [not null]
+  status PRINT_STATUS [not null]
+}
+
+Table issue_copy {
+  id integer [pk]
+  issue_id integer [not null]
+  state PRINT_STATE [not null]
+  status PRINT_STATUS [not null]
+}
+
+Table tag {
+  id integer [pk]
+  name text [not null, unique]
+  description text
+}
+
+Table book_tag {
+  id integer [pk]
+  book_id integer [not null]
+  tag_id integer [not null]
+
+  indexes {
+    (book_id, tag_id) [unique]
+  }
+}
+
+Table periodic_tag {
+  id integer [pk]
+  periodic_id integer [not null]
+  tag_id integer [not null]
+
+  indexes {
+    (periodic_id, tag_id) [unique]
+  }
+}
+
+Table author {
+  id integer [pk]
+  name text
+  surname text
+  middle_name text
+  nickname text
+  birth_date timestamptz
+  death_date timestamptz
+
+  Note: 'Невозможно одновременное отсутствие как имени/фамилии, так и псевдонима'
+}
+
+Table book_author {
+  id integer [pk]
+  book_id integer [not null]
+  author_id integer [not null]
+
+  indexes {
+    (book_id, author_id) [unique]
+  }
+}
+
+Table issue_author {
+  id integer [pk]
+  issue_id integer [not null]
+  author_id integer [not null]
+
+  indexes {
+    (issue_id, author_id) [unique]
+  }
+}
+
+Table copy_loan {
+  id integer [pk]
+  librarian_user_id integer [not null]
+  reader_user_id integer [not null]
+  copy_id integer [not null]
+  load_date timestamptz [not null]
+  due_date timestamptz [not null]
+}
+
+Table issue_copy_loan {
+  id integer [pk]
+  librarian_user_id integer [not null]
+  reader_user_id integer [not null]
+  issue_copy_id integer [not null]
+  load_date timestamptz [not null]
+  due_date timestamptz [not null]
+}
+
+Table copy_return {
+  id integer [pk]
+  copy_id integer [not null]
+  return_date timestamptz [not null]
+  overdue interval [not null]
+
+  Note: 'интервал пуст, если экземпляр возвращен вовремя'
+}
+
+Table issue_copy_return {
+  id integer [pk]
+  issue_copy_id integer [not null]
+  return_date timestamptz [not null]
+  overdue interval [not null]
+
+  Note: 'интервал пуст, если экземпляр возвращен вовремя'
+}
+
+Table copy_loss {
+  id integer [pk]
+  copy_id integer [not null]
+  loss_date timestamptz [not null]
+}
+
+Table issue_copy_loss {
+  id integer [pk]
+  issue_copy_id integer [not null]
+  loss_date timestamptz [not null]
+}
+
+Table audit {
+  id integer [pk]
+  user_id integer [not null]
+  action AUDIT_EVENT [not null]
+  created_at timestamptz [not null]
+  body json
+}
+
+Table book_log {
+  id integer [pk]
+  user_id integer [not null]
+  action PRINT_EVENT [not null]
+  book_id integer [not null]
+  created_at timestamptz [not null]
+  body json
+}
+
+Table periodic_log {
+  id integer [pk]
+  user_id integer [not null]
+  action PRINT_EVENT [not null]
+  periodic_id integer [not null]
+  created_at timestamptz [not null]
+  body json
+}
+
+Table copy_log {
+  id integer [pk]
+  user_id integer [not null]
+  action PRINT_EVENT [not null]
+  copy_id integer [not null]
+  created_at timestamptz [not null]
+  body json
+}
+
+Table issue_log {
+  id integer [pk]
+  user_id integer [not null]
+  action PRINT_EVENT [not null]
+  issue_id integer [not null]
+  created_at timestamptz [not null]
+  body json
+}
+
+Table issue_copy_log {
+  id integer [pk]
+  user_id integer [not null]
+  action PRINT_EVENT [not null]
+  issue_copy_id integer [not null]
+  created_at timestamptz [not null]
+  body json
+}
+
+Ref: user.user_data_id > user_data.id
+Ref: role_permission.permission_id > permission.id
+Ref: role_permission.role_id > role.id
+Ref: user_role.role_id > role.id
+Ref: user_role.user_id > user.id
+
+Ref: issue.periodic_id > periodic.id
+Ref: copy.book_id > book.id
+Ref: issue_copy.issue_id > issue.id
+Ref: book_tag.book_id > book.id
+Ref: book_tag.tag_id > tag.id
+Ref: periodic_tag.periodic_id > periodic.id
+Ref: periodic_tag.tag_id > tag.id
+Ref: book_author.book_id > book.id
+Ref: book_author.author_id > author.id
+Ref: issue_author.issue_id > issue.id
+Ref: issue_author.author_id > author.id
+
+Ref: copy_loan.librarian_user_id > user.id
+Ref: copy_loan.reader_user_id > user.id
+Ref: copy_loan.copy_id > copy.id
+Ref: issue_copy_loan.librarian_user_id > user.id
+Ref: issue_copy_loan.reader_user_id > user.id
+Ref: issue_copy_loan.issue_copy_id > issue_copy.id
+Ref: copy_return.copy_id > copy.id
+Ref: issue_copy_return.issue_copy_id > issue_copy.id
+Ref: copy_loss.copy_id > copy.id
+Ref: issue_copy_loss.issue_copy_id > issue_copy.id
+
+Ref: audit.user_id > user.id
+Ref: book_log.user_id > user.id
+Ref: book_log.book_id > book.id
+Ref: periodic_log.user_id > user.id
+Ref: periodic_log.periodic_id > periodic.id
+Ref: copy_log.user_id > user.id
+Ref: copy_log.copy_id > copy.id
+Ref: issue_log.user_id > user.id
+Ref: issue_log.issue_id > issue.id
+Ref: issue_copy_log.user_id > user.id
+Ref: issue_copy_log.issue_copy_id > issue_copy.id
