@@ -6,10 +6,11 @@
 ## Общие определения
 
 В данном файле при описании сущностей используются спецификаторы доменов допустимых значений, принимаемых полями сущности. В данной секции описаны эти домены:
-1. $\text{BOOL}=\{\top,\bot\}$
-1. $\text{INT}=\mathbb{Z}$
-1. $\text{TEXT}$ - строка в кодировке **UTF-8**
+1. $\text{BOOL}=\{\top,\bot\}$.
+1. $\text{INT}=\mathbb{Z}$.
+1. $\text{TEXT}$ - строка в кодировке **UTF-8**, в соответствии со стандартом Unicode®.
 1. $\text{DATETIME}$ - время и дата с временной зоной.
+1. $\text{JSON}$ - текст в формате JSON, в соответствии с RFC 8259 или любым его надмножеством.
 
 ## Ролевая система контроля доступом
 
@@ -83,7 +84,7 @@
 | id            | INT        | PRIMARY KEY     |                      |                                        |
 | title         | TEXT       | NOT NULL        | название (заголовок) |                                        |
 | publish_date  | DATETIME   | NOT NULL        | дата публикации      |                                        |
-| isbn          | TEXT       | NOT NULL, CHECK |                      | Полная валидация не предполагается[^2] |
+| isbn          | TEXT       | NOT NULL, CHECK |                      | Полная валидация не предполагается[^1] |
 
 - *Сущность*: Периодическое издание
 - *Таблица*: periodic
@@ -92,7 +93,7 @@
 | ------------- | ---------- | --------------- | ---------- | -------------------------------------- |
 | id            | INT        | PRIMARY KEY     |            |                                        |
 | name          | TEXT       | NOT NULL        | название   |                                        |
-| issn          | TEXT       | NOT NULL, CHECK |            | Полная валидация не предполагается[^2] |
+| issn          | TEXT       | NOT NULL, CHECK |            | Полная валидация не предполагается[^1] |
 
 - *Сущность*: Выпуск периодическое издание
 - *Таблица*: issue
@@ -201,19 +202,19 @@
 | id                | INT        | PRIMARY KEY           |                                    |             |
 | librarian_user_id | INT        | NOT NULL, FOREIGN KEY | пользователь-библиотекарь          |             |
 | reader_user_id    | INT        | NOT NULL, FOREIGN KEY | пользователь-читатель (получатель) |             |
-| copy_id           | INT        | NOT_NULL, FOREIGN KEY |                                    |             |
+| copy_id           | INT        | NOT NULL, FOREIGN KEY |                                    |             |
 | load_date         | DATETIME   | NOT NULL              | дата выдачи                        |             |
 | due_date          | DATETIME   | NOT NULL              | крайняя дата возврата              |             |
 
 - *Сущность*: Выдача экземпляра периодического издания пользователю
-- *Таблица*: issue_loan
+- *Таблица*: issue_copy_loan
 
 | Название поля     | Тип данных | Ограничения           | Назначение                         | Комментарий |
 | ----------------- | ---------- | --------------------- | ---------------------------------- | ----------- |
 | id                | INT        | PRIMARY KEY           |                                    |             |
 | librarian_user_id | INT        | NOT NULL, FOREIGN KEY | пользователь-библиотекарь          |             |
 | reader_user_id    | INT        | NOT NULL, FOREIGN KEY | пользователь-читатель (получатель) |             |
-| issue_id          | INT        | NOT_NULL, FOREIGN KEY |                                    |             |
+| issue_copy_id     | INT        | NOT NULL, FOREIGN KEY |                                    |             |
 | load_date         | DATETIME   | NOT NULL              | дата выдачи                        |             |
 | due_date          | DATETIME   | NOT NULL              | крайняя дата возврата              |             |
 
@@ -223,7 +224,7 @@
 | Название поля | Тип данных | Ограничения           | Назначение         | Комментарий                                     |
 | ------------- | ---------- | --------------------- | ------------------ | ----------------------------------------------- |
 | id            | INT        | PRIMARY KEY           |                    |                                                 |
-| copy_id       | INT        | NOT_NULL, FOREIGN KEY |                    |                                                 |
+| copy_id       | INT        | NOT NULL, FOREIGN KEY |                    |                                                 |
 | return_date   | DATETIME   | NOT NULL              | дата возврата      |                                                 |
 | overdue       | INTERVAL   | NOT NULL              | величина просрочки | интервал пуст, если экземпляр возвращен вовремя |
 
@@ -233,7 +234,7 @@
 | Название поля | Тип данных | Ограничения           | Назначение         | Комментарий                                     |
 | ------------- | ---------- | --------------------- | ------------------ | ----------------------------------------------- |
 | id            | INT        | PRIMARY KEY           |                    |                                                 |
-| issue_id      | INT        | NOT_NULL, FOREIGN KEY |                    |                                                 |
+| issue_copy_id | INT        | NOT NULL, FOREIGN KEY |                    |                                                 |
 | return_date   | DATETIME   | NOT NULL              | дата возврата      |                                                 |
 | overdue       | INTERVAL   | NOT NULL              | величина просрочки | интервал пуст, если экземпляр возвращен вовремя |
 
@@ -243,7 +244,7 @@
 | Название поля | Тип данных | Ограничения           | Назначение | Комментарий |
 | ------------- | ---------- | --------------------- | ---------- | ----------- |
 | id            | INT        | PRIMARY KEY           |            |             |
-| copy_id       | INT        | NOT_NULL, FOREIGN KEY |            |             |
+| copy_copy_id  | INT        | NOT NULL, FOREIGN KEY |            |             |
 | loss_date     | DATETIME   | NOT NULL              | дата утери |             |
 
 - *Сущность*: Утеря экземпляра выпуска периодического издания
@@ -252,9 +253,87 @@
 | Название поля | Тип данных | Ограничения           | Назначение | Комментарий |
 | ------------- | ---------- | --------------------- | ---------- | ----------- |
 | id            | INT        | PRIMARY KEY           |            |             |
-| issue_id      | INT        | NOT_NULL, FOREIGN KEY |            |             |
+| issue_copy_id | INT        | NOT NULL, FOREIGN KEY |            |             |
 | loss_date     | DATETIME   | NOT NULL              | дата утери |             |
 
+## Безопасность и журналирование
 
-[^1]: Хранение в формате UTC не означает, что отсутствует необходимость обрабатывать данные локального часового пояса; в данном файле описаны только требования к хранению сущностей в базе, и UTC является необходимой нормализацией.
-[^2]: Валидация печатных идентификаторов слишком сложна в сравнении с решаемыми системой задачами.
+- *Сущность*: Событие безопасности
+- *Перечисление*: `enum AUDIT_EVENT { LOGIN, LOGOUT, REGISTER, GRANT_PERMISSION, REVOKE_PERMISSION, ROLE_UPDATE, FAILED_IDENTIFICATION, FAILED_LOGIN }`
+
+- *Сущность*: Аудит
+- *Таблица*: audit
+
+| Название поля | Тип данных  | Ограничения           | Назначение | Комментарий          |
+| ------------- | ----------- | --------------------- | ---------- | -------------------- |
+| id            | INT         | PRIMARY KEY           |            |                      |
+| user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| action        | AUDIT_EVENT | NOT NULL              |            |                      |
+| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| body          | JSON        |                       |            | Определено действием |
+
+- *Сущность*: Событие по изменению печатного издания
+- *Перечисление*: `enum PRINT_EVENT { CREATE, UPDATE, DELETE }`
+
+- *Сущность*: Изменение книги
+- *Таблица*: book_log
+
+| Название поля | Тип данных  | Ограничения           | Назначение | Комментарий          |
+| ------------- | ----------- | --------------------- | ---------- | -------------------- |
+| id            | INT         | PRIMARY KEY           |            |                      |
+| user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| action        | PRINT_EVENT | NOT NULL              |            |                      |
+| book_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| body          | JSON        |                       |            | Определено действием |
+
+- *Сущность*: Изменение периодического издания
+- *Таблица*: periodic_log
+
+| Название поля | Тип данных  | Ограничения           | Назначение | Комментарий          |
+| ------------- | ----------- | --------------------- | ---------- | -------------------- |
+| id            | INT         | PRIMARY KEY           |            |                      |
+| user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| action        | PRINT_EVENT | NOT NULL              |            |                      |
+| periodic_id   | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| body          | JSON        |                       |            | Определено действием |
+
+- *Сущность*: Изменение экземпляра книги
+- *Таблица*: copy_log
+
+| Название поля | Тип данных  | Ограничения           | Назначение | Комментарий          |
+| ------------- | ----------- | --------------------- | ---------- | -------------------- |
+| id            | INT         | PRIMARY KEY           |            |                      |
+| user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| action        | PRINT_EVENT | NOT NULL              |            |                      |
+| copy_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| body          | JSON        |                       |            | Определено действием |
+
+- *Сущность*: Изменение выпуска периодического издания
+- *Таблица*: issue_log
+
+| Название поля | Тип данных  | Ограничения           | Назначение | Комментарий          |
+| ------------- | ----------- | --------------------- | ---------- | -------------------- |
+| id            | INT         | PRIMARY KEY           |            |                      |
+| user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| action        | PRINT_EVENT | NOT NULL              |            |                      |
+| issue_id      | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| body          | JSON        |                       |            | Определено действием |
+
+- *Сущность*: Изменение экземпляра выпуска периодического издания
+- *Таблица*: issue_copy_log
+
+| Название поля | Тип данных  | Ограничения           | Назначение | Комментарий          |
+| ------------- | ----------- | --------------------- | ---------- | -------------------- |
+| id            | INT         | PRIMARY KEY           |            |                      |
+| user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| action        | PRINT_EVENT | NOT NULL              |            |                      |
+| issue_copy_id | INT         | NOT NULL, FOREIGN KEY |            |                      |
+| timestamp     | DATETIME    | NOT NULL              |            |                      |
+| body          | JSON        |                       |            | Определено действием |
+
+
+[^1]: Валидация печатных идентификаторов слишком сложна в сравнении с решаемыми системой задачами.
