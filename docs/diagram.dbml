@@ -34,6 +34,7 @@ Enum PRINT_EVENT {
 Table user_data {
   id integer [pk]
   is_active boolean [not null]
+  consented_pd boolean [not null]
 }
 
 Table user {
@@ -223,9 +224,18 @@ Table issue_copy_loss {
   loss_date timestamptz [not null]
 }
 
-Table audit {
+Table password_reset_tokens {
   id integer [pk]
   user_id integer [not null]
+  token text [not null]
+  created_at timestamptz [not null]
+  expires_at timestamptz [not null]
+  was_used boolean [not null]
+}
+
+Table audit {
+  id integer [pk]
+  user_id integer
   action AUDIT_EVENT [not null]
   created_at timestamptz [not null]
   body json
@@ -316,3 +326,5 @@ Ref: issue_log.user_id > user.id
 Ref: issue_log.issue_id > issue.id
 Ref: issue_copy_log.user_id > user.id
 Ref: issue_copy_log.issue_copy_id > issue_copy.id
+
+Ref: password_reset_tokens.user_id > user.id

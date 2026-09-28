@@ -142,8 +142,8 @@
       {
         "name": "book_log",
         "schemaName": "public",
-        "x": 1720,
-        "y": 744
+        "x": 1811.026438918324,
+        "y": 270.66251762471524
       },
       {
         "name": "periodic_log",
@@ -180,6 +180,12 @@
         "schemaName": "public",
         "x": 96,
         "y": 904
+      },
+      {
+        "name": "password_reset_tokens",
+        "schemaName": "public",
+        "x": 1244.474609375,
+        "y": 53
       }
     ],
     "tableGroupCollapseStates": [],
