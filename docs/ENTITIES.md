@@ -294,7 +294,7 @@
 | ------------- | ----------- | --------------------- | ---------- | -------------------- |
 | id            | INT         | PRIMARY KEY           |            |                      |
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| token         | TEXT        | NOT NULL              |            |                      |
+| token         | TEXT        | NOT NULL, UNIQUE      |            |                      |
 | created_at    | DATETIME    | NOT NULL              |            |                      |
 | expires_at    | DATETIME    | NOT NULL              |            |                      |
 | was_used      | BOOL        | NOT NULL              |            |                      |
