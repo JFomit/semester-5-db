@@ -106,16 +106,12 @@ Table issue {
 
 Table copy {
   id integer [pk]
-  book_id integer [not null]
+  book_id integer
+  issue_id integer
   state PRINT_STATE [not null]
   status PRINT_STATUS [not null]
-}
 
-Table issue_copy {
-  id integer [pk]
-  issue_id integer [not null]
-  state PRINT_STATE [not null]
-  status PRINT_STATUS [not null]
+  Note: 'CHECK: book_id XOR issue_id'
 }
 
 Table tag {
@@ -153,7 +149,7 @@ Table author {
   birth_date timestamptz
   death_date timestamptz
 
-  Note: 'Невозможно одновременное отсутствие как имени/фамилии, так и псевдонима'
+  Note: 'CHECK: не могут одновременно отсутствовать (name или surname) и nickname'
 }
 
 Table book_author {
@@ -185,27 +181,9 @@ Table copy_loan {
   due_date timestamptz [not null]
 }
 
-Table issue_copy_loan {
-  id integer [pk]
-  librarian_user_id integer [not null]
-  reader_user_id integer [not null]
-  issue_copy_id integer [not null]
-  load_date timestamptz [not null]
-  due_date timestamptz [not null]
-}
-
 Table copy_return {
   id integer [pk]
   copy_id integer [not null]
-  return_date timestamptz [not null]
-  overdue interval [not null]
-
-  Note: 'интервал пуст, если экземпляр возвращен вовремя'
-}
-
-Table issue_copy_return {
-  id integer [pk]
-  issue_copy_id integer [not null]
   return_date timestamptz [not null]
   overdue interval [not null]
 
@@ -216,21 +194,6 @@ Table copy_loss {
   id integer [pk]
   copy_id integer [not null]
   loss_date timestamptz [not null]
-}
-
-Table issue_copy_loss {
-  id integer [pk]
-  issue_copy_id integer [not null]
-  loss_date timestamptz [not null]
-}
-
-Table password_reset_tokens {
-  id integer [pk]
-  user_id integer [not null]
-  token text [not null]
-  created_at timestamptz [not null]
-  expires_at timestamptz [not null]
-  was_used boolean [not null]
 }
 
 Table audit {
@@ -277,16 +240,17 @@ Table issue_log {
   body json
 }
 
-Table issue_copy_log {
+Table password_reset_tokens {
   id integer [pk]
   user_id integer [not null]
-  action PRINT_EVENT [not null]
-  issue_copy_id integer [not null]
+  token text [not null]
   created_at timestamptz [not null]
-  body json
+  expires_at timestamptz [not null]
+  was_used boolean [not null]
 }
 
-Ref: user.user_data_id > user_data.id
+Ref: user_data.id - user.user_data_id
+
 Ref: role_permission.permission_id > permission.id
 Ref: role_permission.role_id > role.id
 Ref: user_role.role_id > role.id
@@ -294,7 +258,8 @@ Ref: user_role.user_id > user.id
 
 Ref: issue.periodic_id > periodic.id
 Ref: copy.book_id > book.id
-Ref: issue_copy.issue_id > issue.id
+Ref: copy.issue_id > issue.id
+
 Ref: book_tag.book_id > book.id
 Ref: book_tag.tag_id > tag.id
 Ref: periodic_tag.periodic_id > periodic.id
@@ -307,13 +272,9 @@ Ref: issue_author.author_id > author.id
 Ref: copy_loan.librarian_user_id > user.id
 Ref: copy_loan.reader_user_id > user.id
 Ref: copy_loan.copy_id > copy.id
-Ref: issue_copy_loan.librarian_user_id > user.id
-Ref: issue_copy_loan.reader_user_id > user.id
-Ref: issue_copy_loan.issue_copy_id > issue_copy.id
+
 Ref: copy_return.copy_id > copy.id
-Ref: issue_copy_return.issue_copy_id > issue_copy.id
 Ref: copy_loss.copy_id > copy.id
-Ref: issue_copy_loss.issue_copy_id > issue_copy.id
 
 Ref: audit.user_id > user.id
 Ref: book_log.user_id > user.id
@@ -324,7 +285,5 @@ Ref: copy_log.user_id > user.id
 Ref: copy_log.copy_id > copy.id
 Ref: issue_log.user_id > user.id
 Ref: issue_log.issue_id > issue.id
-Ref: issue_copy_log.user_id > user.id
-Ref: issue_copy_log.issue_copy_id > issue_copy.id
 
 Ref: password_reset_tokens.user_id > user.id

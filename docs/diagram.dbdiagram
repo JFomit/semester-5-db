@@ -10,202 +10,157 @@
       {
         "name": "user_data",
         "schemaName": "public",
-        "x": 1472,
-        "y": 896
+        "x": 16,
+        "y": 112
       },
       {
         "name": "user",
         "schemaName": "public",
-        "x": 1072,
-        "y": 1128
+        "x": 424,
+        "y": 144
       },
       {
         "name": "permission",
         "schemaName": "public",
-        "x": 1424,
-        "y": 1112
+        "x": 424,
+        "y": 792
       },
       {
         "name": "role",
         "schemaName": "public",
-        "x": 1984,
-        "y": 1056
+        "x": 424,
+        "y": 608
       },
       {
         "name": "role_permission",
         "schemaName": "public",
-        "x": 1800,
-        "y": 1480
+        "x": 1024,
+        "y": 776
       },
       {
         "name": "user_role",
         "schemaName": "public",
-        "x": 1488,
-        "y": 632
+        "x": 1024,
+        "y": 592
       },
       {
         "name": "book",
         "schemaName": "public",
-        "x": 1088,
-        "y": 432
+        "x": 424,
+        "y": 1752
       },
       {
         "name": "periodic",
         "schemaName": "public",
-        "x": 328,
-        "y": 1104
+        "x": 16,
+        "y": 1936
       },
       {
         "name": "issue",
         "schemaName": "public",
-        "x": 840,
-        "y": 936
+        "x": 424,
+        "y": 1968
       },
       {
         "name": "copy",
         "schemaName": "public",
-        "x": 544,
-        "y": 1016
-      },
-      {
-        "name": "issue_copy",
-        "schemaName": "public",
-        "x": 840,
-        "y": 632
+        "x": 1024,
+        "y": 1792
       },
       {
         "name": "tag",
         "schemaName": "public",
-        "x": 704,
-        "y": 1272
+        "x": 424,
+        "y": 2176
       },
       {
         "name": "book_tag",
         "schemaName": "public",
-        "x": 616,
-        "y": 480
+        "x": 1024,
+        "y": 2040
       },
       {
         "name": "periodic_tag",
         "schemaName": "public",
-        "x": 104,
-        "y": 1472
+        "x": 1024,
+        "y": 2400
       },
       {
         "name": "author",
         "schemaName": "public",
-        "x": 752,
-        "y": 72
+        "x": 424,
+        "y": 2360
       },
       {
         "name": "book_author",
         "schemaName": "public",
-        "x": 1272,
-        "y": 48
+        "x": 1024,
+        "y": 2224
       },
       {
         "name": "issue_author",
         "schemaName": "public",
-        "x": 352,
-        "y": 528
+        "x": 1024,
+        "y": 2584
       },
       {
         "name": "copy_loan",
         "schemaName": "public",
-        "x": 384,
-        "y": 1328
-      },
-      {
-        "name": "issue_copy_loan",
-        "schemaName": "public",
-        "x": 1160,
-        "y": 720
+        "x": 1448,
+        "y": 16
       },
       {
         "name": "copy_return",
         "schemaName": "public",
-        "x": 48,
-        "y": 592
+        "x": 1448,
+        "y": 1648
       },
       {
         "name": "copy_loss",
         "schemaName": "public",
-        "x": 544,
-        "y": 736
+        "x": 1448,
+        "y": 1856
       },
       {
         "name": "audit",
         "schemaName": "public",
-        "x": 1280,
-        "y": 1768
+        "x": 1024,
+        "y": 352
       },
       {
         "name": "book_log",
         "schemaName": "public",
-        "x": 1811.026438918324,
-        "y": 270.66251762471524
+        "x": 1024,
+        "y": 960
       },
       {
         "name": "periodic_log",
         "schemaName": "public",
-        "x": 552,
-        "y": 1640
+        "x": 1024,
+        "y": 1240
       },
       {
         "name": "copy_log",
         "schemaName": "public",
-        "x": 896,
-        "y": 1592
+        "x": 1448,
+        "y": 288
       },
       {
         "name": "issue_log",
         "schemaName": "public",
-        "x": 1440,
-        "y": 1384
-      },
-      {
-        "name": "issue_copy_log",
-        "schemaName": "public",
-        "x": 1648,
-        "y": 1088
-      },
-      {
-        "name": "issue_copy_return",
-        "schemaName": "public",
-        "x": 352,
-        "y": 224
-      },
-      {
-        "name": "issue_copy_loss",
-        "schemaName": "public",
-        "x": 96,
-        "y": 904
+        "x": 1024,
+        "y": 1512
       },
       {
         "name": "password_reset_tokens",
         "schemaName": "public",
-        "x": 1244.474609375,
-        "y": 53
+        "x": 1024,
+        "y": 72
       }
     ],
     "tableGroupCollapseStates": [],
     "stickyNoteLayouts": [],
     "referencePaths": [
-      {
-        "firstFieldNames": [
-          "user_data_id"
-        ],
-        "firstTableName": "user",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "user_data",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
       {
         "firstFieldNames": [
           "permission_id"
@@ -292,21 +247,6 @@
           "id"
         ],
         "secondTableName": "book",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
-          "issue_id"
-        ],
-        "firstTableName": "issue_copy",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "issue",
         "secondSchemaName": "public",
         "secondRelation": "1",
         "checkPoints": []
@@ -472,51 +412,6 @@
           "id"
         ],
         "secondTableName": "copy",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
-          "librarian_user_id"
-        ],
-        "firstTableName": "issue_copy_loan",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "user",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
-          "reader_user_id"
-        ],
-        "firstTableName": "issue_copy_loan",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "user",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
-          "issue_copy_id"
-        ],
-        "firstTableName": "issue_copy_loan",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "issue_copy",
         "secondSchemaName": "public",
         "secondRelation": "1",
         "checkPoints": []
@@ -688,9 +583,24 @@
       },
       {
         "firstFieldNames": [
+          "issue_id"
+        ],
+        "firstTableName": "copy",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "issue",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
           "user_id"
         ],
-        "firstTableName": "issue_copy_log",
+        "firstTableName": "password_reset_tokens",
         "firstSchemaName": "public",
         "firstRelation": "*",
         "secondFieldNames": [
@@ -703,45 +613,15 @@
       },
       {
         "firstFieldNames": [
-          "issue_copy_id"
-        ],
-        "firstTableName": "issue_copy_log",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
           "id"
         ],
-        "secondTableName": "issue_copy",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
-          "issue_copy_id"
-        ],
-        "firstTableName": "issue_copy_return",
+        "firstTableName": "user_data",
         "firstSchemaName": "public",
-        "firstRelation": "*",
+        "firstRelation": "1",
         "secondFieldNames": [
-          "id"
+          "user_data_id"
         ],
-        "secondTableName": "issue_copy",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
-          "issue_copy_id"
-        ],
-        "firstTableName": "issue_copy_loss",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "issue_copy",
+        "secondTableName": "user",
         "secondSchemaName": "public",
         "secondRelation": "1",
         "checkPoints": []

@@ -79,8 +79,6 @@
 
 ## Электронный каталог
 
-<!-- TODO: Make a unified table(?) for 2nd lab -->
-
 - *Сущность*: Книга
 - *Таблица*: book
 
@@ -116,27 +114,18 @@
 - *Сущность*: Статус печатного экземпляра
 - *Перечисление*: `enum PRINT_STATUS { STORED, LOANED, LOST, REMOVED }`
 
-<!-- TODO: Unify copy and issue_copy tables(?) for 2nd lab -->
-
 - *Сущность*: Экземпляр
 - *Таблица*: copy
 
-| Название поля | Тип данных   | Ограничения           | Назначение | Комментарий |
-| ------------- | ------------ | --------------------- | ---------- | ----------- |
-| id            | INT          | PRIMARY KEY           |            |             |
-| book_id       | INT          | FOREIGN KEY, NOT NULL |            |             |
-| state         | PRINT_STATE  | NOT NULL              |            |             |
-| status        | PRINT_STATUS | NOT NULL              |            |             |
+| Название поля | Тип данных   | Ограничения         | Назначение | Комментарий |
+| ------------- | ------------ | ------------------- | ---------- | ----------- |
+| id            | INT          | PRIMARY KEY         |            |             |
+| book_id       | INT          | FOREIGN KEY, CHECK  |            |             |
+| issue_id      | INT          | FOREIGN KEY, CHECK  |            |             |
+| state         | PRINT_STATE  | NOT NULL            |            |             |
+| status        | PRINT_STATUS | NOT NULL            |            |             |
 
-- *Сущность*: Экземпляр периодического издания
-- *Таблица*: issue_copy
-
-| Название поля | Тип данных   | Ограничения           | Назначение | Комментарий |
-| ------------- | ------------ | --------------------- | ---------- | ----------- |
-| id            | INT          | PRIMARY KEY           |            |             |
-| issue_id      | INT          | FOREIGN KEY, NOT NULL |            |             |
-| state         | PRINT_STATE  | NOT NULL              |            |             |
-| status        | PRINT_STATUS | NOT NULL              |            |             |
+База данных должна требовать выполнение условия: `book_id XOR issue_id`.
 
 - *Сущность*: Тег
 - *Таблица*: tag
@@ -200,9 +189,7 @@
 
 ## Выдача печатных изданий
 
-<!-- TODO: unify pairwise -->
-
-- *Сущность*: Выдача экземпляра книги пользователю
+- *Сущность*: Выдача экземпляра пользователю
 - *Таблица*: copy_loan
 
 | Название поля     | Тип данных | Ограничения           | Назначение                         | Комментарий |
@@ -211,18 +198,6 @@
 | librarian_user_id | INT        | NOT NULL, FOREIGN KEY | пользователь-библиотекарь          |             |
 | reader_user_id    | INT        | NOT NULL, FOREIGN KEY | пользователь-читатель (получатель) |             |
 | copy_id           | INT        | NOT NULL, FOREIGN KEY |                                    |             |
-| load_date         | DATETIME   | NOT NULL              | дата выдачи                        |             |
-| due_date          | DATETIME   | NOT NULL              | крайняя дата возврата              |             |
-
-- *Сущность*: Выдача экземпляра периодического издания пользователю
-- *Таблица*: issue_copy_loan
-
-| Название поля     | Тип данных | Ограничения           | Назначение                         | Комментарий |
-| ----------------- | ---------- | --------------------- | ---------------------------------- | ----------- |
-| id                | INT        | PRIMARY KEY           |                                    |             |
-| librarian_user_id | INT        | NOT NULL, FOREIGN KEY | пользователь-библиотекарь          |             |
-| reader_user_id    | INT        | NOT NULL, FOREIGN KEY | пользователь-читатель (получатель) |             |
-| issue_copy_id     | INT        | NOT NULL, FOREIGN KEY |                                    |             |
 | load_date         | DATETIME   | NOT NULL              | дата выдачи                        |             |
 | due_date          | DATETIME   | NOT NULL              | крайняя дата возврата              |             |
 
@@ -236,16 +211,6 @@
 | return_date   | DATETIME   | NOT NULL              | дата возврата      |                                                 |
 | overdue       | INTERVAL   | NOT NULL              | величина просрочки | интервал пуст, если экземпляр возвращен вовремя |
 
-- *Сущность*: Возврат экземпляра выпуска периодического издания
-- *Таблица*: issue_copy_return
-
-| Название поля | Тип данных | Ограничения           | Назначение         | Комментарий                                     |
-| ------------- | ---------- | --------------------- | ------------------ | ----------------------------------------------- |
-| id            | INT        | PRIMARY KEY           |                    |                                                 |
-| issue_copy_id | INT        | NOT NULL, FOREIGN KEY |                    |                                                 |
-| return_date   | DATETIME   | NOT NULL              | дата возврата      |                                                 |
-| overdue       | INTERVAL   | NOT NULL              | величина просрочки | интервал пуст, если экземпляр возвращен вовремя |
-
 - *Сущность*: Утеря экземпляра книги
 - *Таблица*: copy_loss
 
@@ -253,15 +218,6 @@
 | ------------- | ---------- | --------------------- | ---------- | ----------- |
 | id            | INT        | PRIMARY KEY           |            |             |
 | copy_id       | INT        | NOT NULL, FOREIGN KEY |            |             |
-| loss_date     | DATETIME   | NOT NULL              | дата утери |             |
-
-- *Сущность*: Утеря экземпляра выпуска периодического издания
-- *Таблица*: issue_copy_loss
-
-| Название поля | Тип данных | Ограничения           | Назначение | Комментарий |
-| ------------- | ---------- | --------------------- | ---------- | ----------- |
-| id            | INT        | PRIMARY KEY           |            |             |
-| issue_copy_id | INT        | NOT NULL, FOREIGN KEY |            |             |
 | loss_date     | DATETIME   | NOT NULL              | дата утери |             |
 
 ## Безопасность и журналирование
@@ -328,18 +284,6 @@
 | user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | action        | PRINT_EVENT | NOT NULL              |            |                      |
 | issue_id      | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| created_at    | DATETIME    | NOT NULL              |            |                      |
-| body          | JSON        |                       |            | Определено действием |
-
-- *Сущность*: Изменение экземпляра выпуска периодического издания
-- *Таблица*: issue_copy_log
-
-| Название поля | Тип данных  | Ограничения           | Назначение | Комментарий          |
-| ------------- | ----------- | --------------------- | ---------- | -------------------- |
-| id            | INT         | PRIMARY KEY           |            |                      |
-| user_id       | INT         | NOT NULL, FOREIGN KEY |            |                      |
-| action        | PRINT_EVENT | NOT NULL              |            |                      |
-| issue_copy_id | INT         | NOT NULL, FOREIGN KEY |            |                      |
 | created_at    | DATETIME    | NOT NULL              |            |                      |
 | body          | JSON        |                       |            | Определено действием |
 
